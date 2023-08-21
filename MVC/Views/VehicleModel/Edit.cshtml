@@ -1,0 +1,44 @@
+@model Service.Models.VehicleModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Vehicle Model</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Edit Vehicle Model</h2>
+
+    <form asp-action="Edit" class="mt-4">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Name</label>
+            <input type="text" asp-for="Name" id="Name" name="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        @{
+            var vehicleMakes = ViewBag.VehicleMakes as List<Service.Models.VehicleMake>;
+        }
+        <div class="mb-3">
+            <label asp-for="VehicleMakeId" class="form-label">Vehicle Make</label>
+            <select class="form-select" asp-for="VehicleMakeId" id="VehicleMakeId" aria-label="VehicleMake">
+                <option value="" selected>Choose a Vehicle Make</option>
+                @foreach (var vehicleMake in vehicleMakes)
+                {
+                    <option value="@vehicleMake.Id">@vehicleMake.Name</option>
+                }
+            </select>
+            <span asp-validation-for="VehicleMakeId" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

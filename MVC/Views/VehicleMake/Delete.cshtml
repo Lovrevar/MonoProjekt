@@ -1,0 +1,58 @@
+@model Service.Models.VehicleMake
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Vehicle Make</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Delete Vehicle Make</h2>
+
+        <div class="mt-4">
+            <h4>Are you sure you want to delete this vehicle?</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">
+                    ID
+                </dt>
+                <dd class="col-sm-10">
+                    @Model.Id
+                </dd>
+                <dt class="col-sm-2">
+                    Name
+                </dt>
+                <dd class="col-sm-10">
+                    @Model.Name
+                </dd>
+                <dt class="col-sm-2">
+                    Abbreviation
+                </dt>
+                <dd class="col-sm-10">
+                    @Model.Abrv
+                </dd>
+            </dl>
+
+            @{
+                var disabled = Model.VehicleModels != null && Model.VehicleModels.Any() ? "disabled" : "";
+                var stringVehicleModelsNames = Model.VehicleModels != null && Model.VehicleModels.Any() ? string.Join(", ", Model.VehicleModels.Select(vm => vm.Name)) : "";
+            }
+            @if (disabled == "disabled")
+            {
+                <div class="alert alert-danger">
+                    Unable to delete Make because beause of attached model: @stringVehicleModelsNames
+                </div>
+            }
+                <form asp-action="Delete" method="post" class="mt-3">
+                    <input type="hidden" asp-for="Id"/>
+
+                    <div class="mb-3">
+                        <input type="submit" value="Delete" @disabled class="btn btn-danger">
+                        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+        </div>
+    </div>
+</body>
+</html>

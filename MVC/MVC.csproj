@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Service\Service.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Shared\Error.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Shared\_ValidationScriptsPartial.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Home\Privacy.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleMake\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleMake\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleMake\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleMake\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleModel\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleModel\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleModel\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\VehicleModel\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\_ViewImports.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+    </ItemGroup>
+
+</Project>

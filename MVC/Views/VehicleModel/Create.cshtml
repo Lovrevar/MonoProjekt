@@ -1,4 +1,4 @@
-@model Service.Models.VehicleModel
+@model MVC.Models.VehicleModel.VehicleModelVM
 
 <!DOCTYPE html>
 <html>
@@ -11,12 +11,12 @@
     <h2>Create Vehicle Model</h2>
 
     <form asp-action="Create" class="mt-4">
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="VehicleModel.Id" />
 
         <div class="mb-3">
-            <label asp-for="Name" class="form-label">Name</label>
-            <input type="text" asp-for="Name" id="Name" name="Name" class="form-control" />
-            <span asp-validation-for="Name" class="text-danger"></span>
+            <label asp-for="VehicleModel.Name" class="form-label">Name</label>
+            <input type="text" asp-for="VehicleModel.Name" id="VehicleModel.Name" name="VehicleModel.Name" class="form-control" />
+            <span asp-validation-for="VehicleModel.Name" class="text-danger"></span>
         </div>
 
         @{

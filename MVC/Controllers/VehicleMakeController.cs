@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models.VehicleMake;
 using Service;
@@ -9,10 +10,12 @@ namespace MVC.Controllers;
 public class VehicleMakeController : Controller
 {
     private readonly IVehicleService _vehicleService;
+    private readonly IMapper _mapper;
 
-    public VehicleMakeController(IVehicleService vehicleService)
+    public VehicleMakeController(IVehicleService vehicleService, IMapper mapper)
     {
         _vehicleService = vehicleService;
+        _mapper = mapper;
     }
 
     public async Task<IActionResult> Index(int page = 1, string searchString = "", string sortOrder = "")
@@ -46,22 +49,23 @@ public class VehicleMakeController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(VehicleMake vehicleMake)
+    public async Task<IActionResult> Create(VehicleMakeVM viewModel) //ISSUES WITH THIS CLASS, NOTHING BEING CREATED
     {
         if (!ModelState.IsValid)
         {
-            return View(vehicleMake);
+            return View(viewModel);
         }
-        
+
         try
         {
-            await _vehicleService.AddVehicleMakeAsync(vehicleMake);
+            var domainModel = _mapper.Map<VehicleMake>(viewModel);
+            await _vehicleService.AddVehicleMakeAsync(domainModel);
             return RedirectToAction("Index");
         }
         catch (Exception)
         {
             ModelState.AddModelError("", "Failed to write to the database.");
-            return View(vehicleMake);
+            return View(viewModel);
         }
     }
 

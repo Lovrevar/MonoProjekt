@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models.VehicleModel;
 using Service;
@@ -8,10 +9,11 @@ namespace MVC.Controllers;
 public class VehicleModelController : Controller
 {
     private readonly IVehicleService _vehicleService;
-
-    public VehicleModelController(IVehicleService vehicleService)
+    private readonly IMapper _mapper;
+    public VehicleModelController(IVehicleService vehicleService, IMapper mapper)
     {
         _vehicleService = vehicleService;
+        _mapper = mapper;
     }
 
     public async Task<ViewResult> Index(int page = 0, string searchString = "", string sortOrder = "")
@@ -46,31 +48,30 @@ public class VehicleModelController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(VehicleModel vehicleModel)
+    public async Task<IActionResult> Create(VehicleModelVM viewModel)
     {
-        var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(vehicleModel.VehicleMakeId);
-        
+        if (!ModelState.IsValid)
+        {
+            var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
+            ViewBag.vehicleMakes = vehicleMakes;
+            return View(viewModel);
+        }
+
+        var domainModel = _mapper.Map<Service.Models.VehicleModel>(viewModel);
+
+        var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(viewModel.VehicleMakeId);
         if (vehicleMake == null)
         {
             ModelState.AddModelError("VehicleMakeId", "Vehicle make does not exist.");
             var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
             ViewBag.vehicleMakes = vehicleMakes;
-            return View(vehicleModel);
-        }
-        
-        vehicleModel.VehicleMake = vehicleMake;
-        vehicleModel.Abrv = vehicleMake.Abrv;
-
-        ModelState.Clear();
-
-        if (!TryValidateModel(vehicleModel, nameof(vehicleModel)))
-        {
-            var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
-            ViewBag.vehicleMakes = vehicleMakes;
-            return View(vehicleModel);
+            return View(viewModel);
         }
 
-        await _vehicleService.UpdateVehicleModelAsync(vehicleModel);
+        domainModel.VehicleMake = vehicleMake;
+        domainModel.Abrv = vehicleMake.Abrv;
+
+        await _vehicleService.UpdateVehicleModelAsync(domainModel);
 
         return RedirectToAction("Index");
     }
@@ -87,37 +88,40 @@ public class VehicleModelController : Controller
 
         var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
 
+        var viewModel = _mapper.Map<VehicleModelVM>(vehicleModel); // Use AutoMapper to map the domain model
+
+        viewModel.VehicleModel = vehicleModel; // Assign the domain model to the VehicleModel property
+
         ViewBag.vehicleMakes = vehicleMakes;
 
-        return View(vehicleModel);
+        return View(viewModel); // Pass the VehicleModelVM to the view
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(VehicleModel vehicleModel)
+    public async Task<IActionResult> Edit(VehicleModelVM viewModel)
     {
-        var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(vehicleModel.VehicleMakeId);
-        
+        if (!ModelState.IsValid)
+        {
+            var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
+            ViewBag.vehicleMakes = vehicleMakes;
+            return View(viewModel);
+        }
+
+        var domainModel = _mapper.Map<Service.Models.VehicleModel>(viewModel);
+
+        var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(viewModel.VehicleMakeId);
         if (vehicleMake == null)
         {
             ModelState.AddModelError("VehicleMakeId", "Vehicle make does not exist.");
             var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
             ViewBag.vehicleMakes = vehicleMakes;
-            return View(vehicleModel);
-        }
-        
-        vehicleModel.VehicleMake = vehicleMake;
-        vehicleModel.Abrv = vehicleMake.Abrv;
-
-        ModelState.Clear();
-
-        if (!TryValidateModel(vehicleModel, nameof(vehicleModel)))
-        {
-            var vehicleMakes = await _vehicleService.GetVehicleMakesAsync("");
-            ViewBag.vehicleMakes = vehicleMakes;
-            return View(vehicleModel);
+            return View(viewModel);
         }
 
-        await _vehicleService.UpdateVehicleModelAsync(vehicleModel);
+        domainModel.VehicleMake = vehicleMake;
+        domainModel.Abrv = vehicleMake.Abrv;
+
+        await _vehicleService.UpdateVehicleModelAsync(domainModel);
 
         return RedirectToAction("Index");
     }

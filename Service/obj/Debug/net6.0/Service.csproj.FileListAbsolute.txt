@@ -108,3 +108,4 @@ C:\Users\Lovre\RiderProjects\MonoProjekt\Service\obj\Debug\net6.0\refint\Service
 C:\Users\Lovre\RiderProjects\MonoProjekt\Service\obj\Debug\net6.0\Service.pdb
 C:\Users\Lovre\RiderProjects\MonoProjekt\Service\obj\Debug\net6.0\Service.genruntimeconfig.cache
 C:\Users\Lovre\RiderProjects\MonoProjekt\Service\obj\Debug\net6.0\ref\Service.dll
+C:\Users\Lovre\RiderProjects\MonoProjekt\Service\bin\Debug\net6.0\AutoMapper.dll

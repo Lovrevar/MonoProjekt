@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Routing.Constraints;
 using Service.DataAccess;
 using Service;
+using MVC.Models;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<MyDbContext>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddAutoMapper(typeof(MappingProfiles));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

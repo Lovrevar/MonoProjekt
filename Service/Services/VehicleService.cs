@@ -2,11 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Service.DataAccess;
 using Service.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Threading.Tasks;
+using MVC.Models.VehicleMake;
+using MVC.Models.VehicleModel;
 
 namespace Service
 {
@@ -19,36 +18,84 @@ namespace Service
             _dbContext = dbContext;
         }
 
-        public async Task<List<VehicleMake?>> GetVehicleMakes(QueryParams parameters)
+        public async Task<MakeListVM> GetMakeListViewModel(QueryParams parameters)
         {
-            var query = _dbContext.VehicleMakes.AsQueryable();
+            var pagingResult = await GetVehicleMakes(parameters);
 
-            if (!string.IsNullOrEmpty(parameters.SearchString))
+            return new MakeListVM
             {
-                query = query.Where(vm =>
-                    vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
-                    vm.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
-            }
-
-            query = ApplySorting(query, parameters.SortOrder);
-
-            return await ApplyPaging(query, parameters.Page, parameters.PageSize).ToListAsync();
+                Makes = pagingResult.Data,
+                Pagination = new PagedList
+                {
+                    CurrentPage = pagingResult.Page,
+                    PageSize = pagingResult.PageSize,
+                    TotalPages = (int)Math.Ceiling((double)pagingResult.TotalItems / pagingResult.PageSize),
+                    SearchString = parameters.SearchString
+                }
+            };
         }
 
-        public async Task<List<VehicleModel>> GetVehicleModels(QueryParams parameters)
+        public async Task<ModelListVM> GetModelListViewModel(QueryParams parameters)
+        {
+            var pagingResult = await GetVehicleModels(parameters);
+
+            return new ModelListVM
+            {
+                Models = pagingResult.Data,
+                Pagination = new PagedList
+                {
+                    CurrentPage = pagingResult.Page,
+                    PageSize = pagingResult.PageSize,
+                    TotalPages = (int)Math.Ceiling((double)pagingResult.TotalItems / pagingResult.PageSize),
+                    SearchString = parameters.SearchString
+                }
+            };
+        }
+
+        public async Task<Paging<VehicleMake?>> GetVehicleMakes(QueryParams parameters)
+        {
+            var query = _dbContext.VehicleMakes.AsQueryable();
+            var filteringOptions = new Filtering<VehicleMake?> { SearchString = parameters.SearchString };
+            query = filteringOptions.ApplyFiltering(query, vm =>
+                vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
+                vm.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
+
+            var sortingOptions = new Sorting<VehicleMake?> { SortProperty = parameters.SortProperty, SortDirection = parameters.SortDirection };
+            query = sortingOptions.ApplySorting(query);
+
+            var pagedQuery = ApplyPaging(query, parameters.Page, parameters.PageSize);
+            var totalItems = await query.CountAsync();
+
+            return new Paging<VehicleMake?>
+            {
+                Data = await pagedQuery.ToListAsync(),
+                TotalItems = totalItems,
+                Page = parameters.Page,
+                PageSize = parameters.PageSize
+            };
+        }
+
+        public async Task<Paging<VehicleModel>> GetVehicleModels(QueryParams parameters)
         {
             var query = _dbContext.VehicleModels.AsQueryable();
+            var filteringOptions = new Filtering<VehicleModel> { SearchString = parameters.SearchString };
+            query = filteringOptions.ApplyFiltering(query, vm =>
+                vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
+                vm.VehicleMake.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
 
-            if (!string.IsNullOrEmpty(parameters.SearchString))
+            var sortingOptions = new Sorting<VehicleModel> { SortProperty = parameters.SortProperty, SortDirection = parameters.SortDirection };
+            query = sortingOptions.ApplySorting(query);
+
+            var pagedQuery = ApplyPaging(query, parameters.Page, parameters.PageSize).Include(vmo => vmo.VehicleMake);
+            var totalItems = await query.CountAsync();
+
+            return new Paging<VehicleModel>
             {
-                query = query.Where(vm =>
-                    vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
-                    vm.VehicleMake.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
-            }
-
-            query = ApplySorting(query, parameters.SortOrder);
-
-            return await ApplyPaging(query, parameters.Page, parameters.PageSize).Include(vmo => vmo.VehicleMake).ToListAsync();
+                Data = await pagedQuery.ToListAsync(),
+                TotalItems = totalItems,
+                Page = parameters.Page,
+                PageSize = parameters.PageSize
+            };
         }
 
         public async Task<VehicleMake?> GetVehicleMakeByIdAsync(int id)
@@ -103,41 +150,7 @@ namespace Service
             await _dbContext.SaveChangesAsync();
         }
 
-        
-        
-        private static IQueryable<T> ApplySorting<T>(IQueryable<T> query, string sortOrder)
-        {
-            if (string.IsNullOrEmpty(sortOrder))
-            {
-                return query;
-            }
-
-            var sortExpression = sortOrder.Split('_');
-            var sortProperty = sortExpression[0];
-            var sortDirection = sortExpression[1];
-
-            var entityType = typeof(T);
-            var parameter = Expression.Parameter(entityType, "e");
-            var propertyInfo = entityType.GetProperty(sortProperty, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-            if (propertyInfo == null)
-            {
-                // Handle the case when the property is not found
-                return query;
-            }
-
-            var propertyAccess = Expression.Property(parameter, propertyInfo);
-            var orderByExpression = Expression.Lambda<Func<T, object>>(Expression.Convert(propertyAccess, typeof(object)), parameter);
-
-            var sortedQuery = sortDirection.Equals("asc", StringComparison.OrdinalIgnoreCase)
-                ? Queryable.OrderBy(query, orderByExpression)
-                : Queryable.OrderByDescending(query, orderByExpression);
-
-            return sortedQuery;
-        }
-
-
-        private static IQueryable<T> ApplyPaging<T>(IQueryable<T> query, int page, int pageSize)
+        private IQueryable<T> ApplyPaging<T>(IQueryable<T> query, int page, int pageSize)
         {
             return query.Skip((page - 1) * pageSize).Take(pageSize);
         }

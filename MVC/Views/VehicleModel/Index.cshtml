@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model MVC.Models.VehicleModel.VehicleModelVM
+@model MVC.Models.VehicleModel.ModelListVM
 
 <!DOCTYPE html>
 <html>
@@ -18,7 +18,7 @@
             <div class="col">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" name="searchString" value="@Model.Pagination.SearchString">
+                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" name="searchString" value="@Model.SearchString">
                         <button class="btn btn-outline-secondary" type="submit">Search</button>
                     </div>
                 </form>
@@ -30,21 +30,21 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "id_asc" })">Id</a></th>
-                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "name_asc" })">Name</a></th>
-                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "make_asc" })">Make Name</a></th>
-                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "abrv_asc" })">Make Abrv</a></th>
+                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "id_asc" })">Id</a></th>
+                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "name_asc" })">Name</a></th>
+                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "make_asc" })">Make Name</a></th>
+                    <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "abrv_asc" })">Make Abrv</a></th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var vehicleModel in Model.VehicleModels)
+                @foreach (var vehicleModel in Model.Models)
                 {
                     <tr>
-                        <td>@vehicleModel.VehicleMakeId</td>
+                        <td>@vehicleModel.Id</td>
                         <td>@vehicleModel.Name</td>
-                        <td>@vehicleModel.VehicleMake.Name</td>
-                        <td>@vehicleModel.VehicleMake.Abrv</td>
+                        <td>@vehicleModel.MakeName</td>
+                        <td>@vehicleModel.MakeAbrv</td>
                         <td>
                             <a href="@Url.Action("Edit", new { id = vehicleModel.Id })" class="btn btn-sm btn-warning">Edit</a>
                             <a href="@Url.Action("Delete", new { id = vehicleModel.Id })" class="btn btn-sm btn-danger">Delete</a>
@@ -63,19 +63,19 @@
                     @if (Model.Pagination.CurrentPage > 1)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, searchString = Model.Pagination.SearchString })">Previous</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, searchString = Model.SearchString })">Previous</a>
                         </li>
                     }
                     @for (var i = 1; i <= Model.Pagination.TotalPages; i++)
                     {
                         <li class="page-item @(Model.Pagination.CurrentPage == i ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = Model.Pagination.SearchString })">@i</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = Model.SearchString })">@i</a>
                         </li>
                     }
                     @if (Model.Pagination.CurrentPage < Model.Pagination.TotalPages)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, searchString = Model.Pagination.SearchString })">Next</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, searchString = Model.SearchString })">Next</a>
                         </li>
                     }
                 </ul>

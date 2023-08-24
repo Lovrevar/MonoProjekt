@@ -1,8 +1,13 @@
-namespace MVC.Models.VehicleModel;
+using System.Collections.Generic;
+using Service.Models; 
+using MVC.Models; 
 
-public class VehicleModelVM
+namespace MVC.Models.VehicleModel
 {
-        public List<Service.Models.VehicleModel> VehicleModels { get; set; }
+    public class VehicleModelVM
+    {
+        public List<Service.Models.VehicleModel> Models { get; set; } // Assuming VehicleModel is from the Service.Models namespace
         public int TotalVehicleModels { get; set; }
-        public PagedList Pagination { get; set; } 
+        public PagedList Pagination { get; set; } // Assuming PagedList is from the MVC.Models namespace
+    }
 }

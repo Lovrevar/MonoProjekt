@@ -23,36 +23,28 @@ namespace MVC.Controllers
         {
             const int pageSize = 10;
 
-            var vehicleModels = await _vehicleService.GetVehicleModels(new QueryParams()
+            var pagingResult = await _vehicleService.GetModelListViewModel(new QueryParams()
             {
                 Page = page,
                 PageSize = pageSize,
-                SearchString = searchString,
                 SortOrder = sortOrder
             });
-            
-            var allVehicleModels = await _vehicleService.GetVehicleMakes(new QueryParams()
-            {
-                SearchString = searchString
-            });
-            var totalPages = (int)Math.Ceiling((double)allVehicleModels.Count() / pageSize);
-            page = Math.Clamp(page, 0, totalPages);
 
-            var viewModel = new VehicleModelVM()
+            var viewModel = new ModelListVM
             {
-                VehicleModels = vehicleModels,
-                TotalVehicleModels = allVehicleModels.Count(),
+                Models = pagingResult.Models,
                 Pagination = new PagedList
                 {
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalPages = totalPages,
-                    SearchString = searchString
-                }
+                    CurrentPage = pagingResult.Pagination.CurrentPage,
+                    PageSize = pagingResult.Pagination.PageSize,
+                    TotalPages = pagingResult.Pagination.TotalPages
+                },
+                SearchString = searchString
             };
 
             return View(viewModel);
         }
+
 
         public async Task<IActionResult> Create()
         {

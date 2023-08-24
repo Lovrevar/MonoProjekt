@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using MVC.Models.VehicleMake;
 using Service;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using MVC.Models;
 using Service.Models;
@@ -22,33 +21,23 @@ namespace MVC.Controllers
         {
             const int pageSize = 10;
 
-            var vehicleMakes = await _vehicleService.GetVehicleMakes(new QueryParams()
+            var pagingResult = await _vehicleService.GetMakeListViewModel(new QueryParams
             {
                 Page = page,
                 PageSize = pageSize,
-                SearchString = searchString,
                 SortOrder = sortOrder
             });
 
-            var allVehicleMakes = await _vehicleService.GetVehicleMakes(new QueryParams()
+            var viewModel = new MakeListVM
             {
-                SearchString = searchString
-            });
-            var totalPages = (int)Math.Ceiling((double)allVehicleMakes.Count() / pageSize);
-
-            page = Math.Clamp(page, 0, totalPages);
-
-            var viewModel = new VehicleMakeVM()
-            {
-                VehicleMakes = vehicleMakes,
-                TotalVehicleMakes = allVehicleMakes.Count(),
+                Makes = pagingResult.Makes,
                 Pagination = new PagedList
                 {
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalPages = totalPages,
-                    SearchString = searchString
-                }
+                    CurrentPage = pagingResult.Pagination.CurrentPage,
+                    PageSize = pagingResult.Pagination.PageSize,
+                    TotalPages = pagingResult.Pagination.TotalPages
+                },
+                SearchString = searchString
             };
 
             return View(viewModel);

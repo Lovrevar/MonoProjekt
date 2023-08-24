@@ -1,5 +1,5 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model MVC.Models.VehicleMake.VehicleMakeVM
+@model MVC.Models.VehicleMake.MakeListVM
 
 <!DOCTYPE html>
 <html>
@@ -18,7 +18,7 @@
             <div class="col">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" name="searchString" value="@Model.Pagination.SearchString">
+                        <input type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" name="searchString" value="@Model.SearchString">
                         <button class="btn btn-outline-secondary" type="submit">Search</button>
                     </div>
                 </form>
@@ -29,14 +29,14 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "id_asc" })">Id</a></th>
-                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "name_asc" })">Name</a></th>
-                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.Pagination.SearchString, sortOrder = "abrv_asc" })">Abrv</a></th>
+                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "Id_asc" })">Id</a></th>
+                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "Name_asc" })">Name</a></th>
+                        <th><a href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage, searchString = Model.SearchString, sortOrder = "Abrv_asc" })">Abrv</a></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var vehicleMake in Model.VehicleMakes)
+                    @foreach (var vehicleMake in Model.Makes)
                     {
                         <tr>
                             <td>@vehicleMake.Id</td>
@@ -59,19 +59,19 @@
                     @if (Model.Pagination.CurrentPage > 1)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, searchString = Model.Pagination.SearchString })">Previous</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage - 1, searchString = Model.SearchString })">Previous</a>
                         </li>
                     }
                     @for (var i = 1; i <= Model.Pagination.TotalPages; i++)
                     {
                         <li class="page-item @(Model.Pagination.CurrentPage == i ? "active" : "")">
-                            <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = Model.Pagination.SearchString })">@i</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = i, searchString = Model.SearchString })">@i</a>
                         </li>
                     }
                     @if (Model.Pagination.CurrentPage < Model.Pagination.TotalPages)
                     {
                         <li class="page-item">
-                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, searchString = Model.Pagination.SearchString })">Next</a>
+                            <a class="page-link" href="@Url.Action("Index", new { page = Model.Pagination.CurrentPage + 1, searchString = Model.SearchString })">Next</a>
                         </li>
                     }
                 </ul>

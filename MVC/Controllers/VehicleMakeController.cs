@@ -3,6 +3,7 @@ using MVC.Models.VehicleMake;
 using Service;
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using MVC.Models;
 using Service.Models;
 
@@ -11,34 +12,26 @@ namespace MVC.Controllers
     public class VehicleMakeController : Controller
     {
         private readonly IVehicleService _vehicleService;
+        private readonly IMapper _mapper;
 
-        public VehicleMakeController(IVehicleService vehicleService)
+        public VehicleMakeController(IVehicleService vehicleService,IMapper mapper)
         {
             _vehicleService = vehicleService;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index(int page = 1, string searchString = "", string sortOrder = "")
         {
             const int pageSize = 10;
 
-            var pagingResult = await _vehicleService.GetMakeListViewModel(new QueryParams
-            {
-                Page = page,
-                PageSize = pageSize,
-                SortOrder = sortOrder
-            });
+            var filteringOptions = new Filtering<VehicleMake?> { SearchString = searchString };
+            var sortingOptions = new Sorting<VehicleMake?> { SortProperty = "Name", SortDirection = sortOrder };
+            var pagingOptions = new Paging<VehicleMake?> { Page = page, PageSize = pageSize };
 
-            var viewModel = new MakeListVM
-            {
-                Makes = pagingResult.Makes,
-                Pagination = new PagedList
-                {
-                    CurrentPage = pagingResult.Pagination.CurrentPage,
-                    PageSize = pagingResult.Pagination.PageSize,
-                    TotalPages = pagingResult.Pagination.TotalPages
-                },
-                SearchString = searchString
-            };
+            var pagingResult = await _vehicleService.GetVehicleMakes(filteringOptions, sortingOptions, pagingOptions);
+
+            var viewModel = _mapper.Map<MakeListVM>(pagingResult);
+            viewModel.SearchString = searchString;
 
             return View(viewModel);
         }
@@ -50,12 +43,14 @@ namespace MVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(VehicleMake vehicleMake)
+        public async Task<IActionResult> Create(CreateMakeVM createMakeVm)
         {
             if (!ModelState.IsValid)
             {
-                return View(vehicleMake);
+                return View(createMakeVm);
             }
+
+            var vehicleMake = _mapper.Map<VehicleMake>(createMakeVm);
 
             try
             {
@@ -65,34 +60,25 @@ namespace MVC.Controllers
             catch (Exception)
             {
                 ModelState.AddModelError("", "Failed to write to the database.");
-                return View(vehicleMake);
+                return View(createMakeVm);
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(id);
+            var vehicleMakeWithModels = await _vehicleService.GetVehicleMakeByIdAsync(id);
 
-            if (vehicleMake == null)
+            if (vehicleMakeWithModels == null)
             {
                 return NotFound();
             }
 
-            return View(vehicleMake);
-        }
+            var updateMakeVM = _mapper.Map<UpdateMakeVM>(vehicleMakeWithModels);
 
-        [HttpPost]
-        public async Task<IActionResult> Edit(VehicleMake vehicleMake)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(vehicleMake);
-            }
+            // No need to fetch related data separately since it's already included
 
-            await _vehicleService.UpdateVehicleMakeAsync(vehicleMake);
-
-            return RedirectToAction("Index");
+            return View(updateMakeVM);
         }
 
         [HttpGet]

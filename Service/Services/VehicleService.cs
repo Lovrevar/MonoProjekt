@@ -4,97 +4,57 @@ using Service.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MVC.Models.VehicleMake;
-using MVC.Models.VehicleModel;
 
 namespace Service
 {
     public class VehicleService : IVehicleService
     {
         private readonly MyDbContext _dbContext;
+        private IVehicleService _vehicleServiceImplementation;
 
         public VehicleService(MyDbContext dbContext)
         {
             _dbContext = dbContext;
         }
-
-        public async Task<MakeListVM> GetMakeListViewModel(QueryParams parameters)
-        {
-            var pagingResult = await GetVehicleMakes(parameters);
-
-            return new MakeListVM
-            {
-                Makes = pagingResult.Data,
-                Pagination = new PagedList
-                {
-                    CurrentPage = pagingResult.Page,
-                    PageSize = pagingResult.PageSize,
-                    TotalPages = (int)Math.Ceiling((double)pagingResult.TotalItems / pagingResult.PageSize),
-                    SearchString = parameters.SearchString
-                }
-            };
-        }
-
-        public async Task<ModelListVM> GetModelListViewModel(QueryParams parameters)
-        {
-            var pagingResult = await GetVehicleModels(parameters);
-
-            return new ModelListVM
-            {
-                Models = pagingResult.Data,
-                Pagination = new PagedList
-                {
-                    CurrentPage = pagingResult.Page,
-                    PageSize = pagingResult.PageSize,
-                    TotalPages = (int)Math.Ceiling((double)pagingResult.TotalItems / pagingResult.PageSize),
-                    SearchString = parameters.SearchString
-                }
-            };
-        }
-
-        public async Task<Paging<VehicleMake?>> GetVehicleMakes(QueryParams parameters)
+        public async Task<Paging<VehicleMake?>> GetVehicleMakes(Filtering<VehicleMake?> filteringOptions, Sorting<VehicleMake?> sortingOptions, Paging<VehicleMake?> pagingOptions)
         {
             var query = _dbContext.VehicleMakes.AsQueryable();
-            var filteringOptions = new Filtering<VehicleMake?> { SearchString = parameters.SearchString };
             query = filteringOptions.ApplyFiltering(query, vm =>
-                vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
-                vm.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
+                vm.Name.ToLower().Contains(filteringOptions.SearchString.ToLower()) ||
+                vm.Abrv.ToLower().Contains(filteringOptions.SearchString.ToLower()));
 
-            var sortingOptions = new Sorting<VehicleMake?> { SortProperty = parameters.SortProperty, SortDirection = parameters.SortDirection };
             query = sortingOptions.ApplySorting(query);
 
-            var pagedQuery = ApplyPaging(query, parameters.Page, parameters.PageSize);
+            var pagedQuery = ApplyPaging(query, pagingOptions.Page, pagingOptions.PageSize);
             var totalItems = await query.CountAsync();
 
             return new Paging<VehicleMake?>
             {
                 Data = await pagedQuery.ToListAsync(),
                 TotalItems = totalItems,
-                Page = parameters.Page,
-                PageSize = parameters.PageSize
+                Page = pagingOptions.Page,
+                PageSize = pagingOptions.PageSize
             };
         }
 
-        public async Task<Paging<VehicleModel>> GetVehicleModels(QueryParams parameters)
+        public async Task<Paging<VehicleModel>> GetVehicleModels(Filtering<VehicleModel> filteringOptions, Sorting<VehicleModel> sortingOptions, Paging<VehicleModel> pagingOptions)
         {
             var query = _dbContext.VehicleModels.AsQueryable();
-            var filteringOptions = new Filtering<VehicleModel> { SearchString = parameters.SearchString };
             query = filteringOptions.ApplyFiltering(query, vm =>
-                vm.Name.ToLower().Contains(parameters.SearchString.ToLower()) ||
-                vm.VehicleMake.Abrv.ToLower().Contains(parameters.SearchString.ToLower()));
+                vm.Name.ToLower().Contains(filteringOptions.SearchString.ToLower()) ||
+                vm.VehicleMake.Abrv.ToLower().Contains(filteringOptions.SearchString.ToLower()));
 
-            var sortingOptions = new Sorting<VehicleModel> { SortProperty = parameters.SortProperty, SortDirection = parameters.SortDirection };
             query = sortingOptions.ApplySorting(query);
 
-            var pagedQuery = ApplyPaging(query, parameters.Page, parameters.PageSize).Include(vmo => vmo.VehicleMake);
+            var pagedQuery = ApplyPaging(query, pagingOptions.Page, pagingOptions.PageSize).Include(vmo => vmo.VehicleMake);
             var totalItems = await query.CountAsync();
 
             return new Paging<VehicleModel>
             {
                 Data = await pagedQuery.ToListAsync(),
                 TotalItems = totalItems,
-                Page = parameters.Page,
-                PageSize = parameters.PageSize
+                Page = pagingOptions.Page,
+                PageSize = pagingOptions.PageSize
             };
         }
 
@@ -114,16 +74,44 @@ namespace Service
             _dbContext.Set<VehicleMake>().Add(vehicleMake);
             await _dbContext.SaveChangesAsync();
         }
-
-        public async Task UpdateVehicleMakeAsync(VehicleMake? vehicleMake)
+        public async Task AddVehicleModelAsync(VehicleModel vehicleModel)
         {
-            _dbContext.VehicleMakes.Update(vehicleMake);
+            _dbContext.VehicleModels.Add(vehicleModel);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateVehicleModelAsync(VehicleModel vehicleModel)
+        public async Task UpdateVehicleMakeAsync(int id, VehicleMake updatedVehicleMake)
         {
-            _dbContext.VehicleModels.Update(vehicleModel);
+            var existingVehicleMake = await _dbContext.VehicleMakes.FindAsync(id);
+
+            if (existingVehicleMake == null)
+            {
+                throw new ArgumentException("Vehicle Make with the specified id not found.", nameof(id));
+            }
+
+            // Update the properties of the existingVehicleMake with the properties from updatedVehicleMake
+            existingVehicleMake.Name = updatedVehicleMake.Name;
+            existingVehicleMake.Abrv = updatedVehicleMake.Abrv;
+
+            _dbContext.VehicleMakes.Update(existingVehicleMake);
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+        public async Task UpdateVehicleModelAsync(int id, VehicleModel vehicleModel)
+        {
+            var existingModel = await _dbContext.VehicleModels.FirstOrDefaultAsync(vm => vm.Id == id);
+
+            if (existingModel == null)
+            {
+                throw new ArgumentException("Vehicle model not found.", nameof(id));
+            }
+
+            // Update properties of the existingModel based on the vehicleModel parameter
+            existingModel.Name = vehicleModel.Name;
+            existingModel.VehicleMakeId = vehicleModel.VehicleMakeId;
+
+            _dbContext.VehicleModels.Update(existingModel);
             await _dbContext.SaveChangesAsync();
         }
 

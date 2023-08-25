@@ -1,4 +1,5 @@
-@model Service.Models.VehicleModel
+@model MVC.Models.VehicleModel.UpdateModelVM
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 <!DOCTYPE html>
 <html>
@@ -10,7 +11,7 @@
 <div class="container mt-5">
     <h2>Edit Vehicle Model</h2>
 
-    <form asp-action="Edit" class="mt-4">
+    <form asp-action="Edit" method="post" class="mt-4">
         <input type="hidden" asp-for="Id" />
 
         <div class="mb-3">
@@ -18,20 +19,20 @@
             <input type="text" asp-for="Name" id="Name" name="Name" class="form-control" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-
+        
         @{
-            var vehicleMakes = ViewBag.VehicleMakes as List<Service.Models.VehicleMake>;
+            var vehicleMakes = ViewBag.vehicleMakes as List<Service.Models.VehicleMake>;
         }
         <div class="mb-3">
-            <label asp-for="VehicleMakeId" class="form-label">Vehicle Make</label>
-            <select class="form-select" asp-for="VehicleMakeId" id="VehicleMakeId" aria-label="VehicleMake">
+            <label asp-for="MakeId" class="form-label">Vehicle Make</label>
+            <select class="form-select" asp-for="MakeId" id="MakeId" aria-label="VehicleMake">
                 <option value="" selected>Choose a Vehicle Make</option>
                 @foreach (var vehicleMake in vehicleMakes)
                 {
                     <option value="@vehicleMake.Id">@vehicleMake.Name</option>
                 }
             </select>
-            <span asp-validation-for="VehicleMakeId" class="text-danger"></span>
+            <span asp-validation-for="MakeId" class="text-danger"></span>
         </div>
 
         <div class="mb-3">

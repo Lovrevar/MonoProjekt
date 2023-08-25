@@ -1,19 +1,18 @@
+using System.Threading.Tasks;
 using Service.Models;
-using MVC.Models.VehicleMake;
 
 namespace Service
 {
     public interface IVehicleService
     {
-        Task<Paging<VehicleMake?>> GetVehicleMakes(QueryParams parameters);
-        Task<MakeListVM> GetMakeListViewModel(QueryParams parameters);
-        Task<ModelListVM> GetModelListViewModel(QueryParams parameters);
-        Task<Paging<VehicleModel>> GetVehicleModels(QueryParams parameters);
+        Task<Paging<VehicleMake?>> GetVehicleMakes(Filtering<VehicleMake?> filteringOptions, Sorting<VehicleMake?> sortingOptions, Paging<VehicleMake?> pagingOptions);
+        Task<Paging<VehicleModel>> GetVehicleModels(Filtering<VehicleModel> filteringOptions, Sorting<VehicleModel> sortingOptions, Paging<VehicleModel> pagingOptions);
         Task<VehicleMake?> GetVehicleMakeByIdAsync(int id);
         Task<VehicleModel?> GetVehicleModelByIdAsync(int id);
         Task AddVehicleMakeAsync(VehicleMake vehicleMake);
-        Task UpdateVehicleMakeAsync(VehicleMake? vehicleMake);
-        Task UpdateVehicleModelAsync(VehicleModel vehicleModel);
+        Task AddVehicleModelAsync(VehicleModel vehicleModel);
+        Task UpdateVehicleMakeAsync(int id, VehicleMake? vehicleMake);
+        Task UpdateVehicleModelAsync(int id, VehicleModel vehicleModel);
         Task DeleteVehicleMakeAsync(int id);
         Task DeleteVehicleModelAsync(int id);
     }

@@ -118,3 +118,5 @@ C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\bin\Debug\net6.0\Mono.TextTemplatin
 C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\bin\Debug\net6.0\System.CodeDom.dll
 C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\obj\Debug\net6.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\obj\Debug\net6.0\scopedcss\projectbundle\MVC.bundle.scp.css
+C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\bin\Debug\net6.0\AutoMapper.dll
+C:\Users\Lovre\RiderProjects\MonoProjekt\MVC\bin\Debug\net6.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

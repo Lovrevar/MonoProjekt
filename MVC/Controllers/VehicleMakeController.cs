@@ -1,20 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using MVC.Models.VehicleMake;
 using Service;
-using System;
-using System.Threading.Tasks;
 using AutoMapper;
-using MVC.Models;
 using Service.Models;
+using Service.Services.MakeService;
 
 namespace MVC.Controllers
 {
     public class VehicleMakeController : Controller
     {
-        private readonly IVehicleService _vehicleService;
+        private readonly IVehicleMakeService _vehicleService;
         private readonly IMapper _mapper;
 
-        public VehicleMakeController(IVehicleService vehicleService,IMapper mapper)
+        public VehicleMakeController(IVehicleMakeService vehicleService,IMapper mapper)
         {
             _vehicleService = vehicleService;
             _mapper = mapper;
@@ -63,22 +61,45 @@ namespace MVC.Controllers
                 return View(createMakeVm);
             }
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var vehicleMakeWithModels = await _vehicleService.GetVehicleMakeByIdAsync(id);
+            var vehicleMake = await _vehicleService.GetVehicleMakeByIdAsync(id);
 
-            if (vehicleMakeWithModels == null)
+            if (vehicleMake == null)
             {
                 return NotFound();
             }
 
-            var updateMakeVM = _mapper.Map<UpdateMakeVM>(vehicleMakeWithModels);
+            return View(_mapper.Map<UpdateMakeVM>(vehicleMake));
+        }
 
-            // No need to fetch related data separately since it's already included
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, UpdateMakeVM updateMakeVm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(updateMakeVm);
+            }
 
-            return View(updateMakeVM);
+            var updatedVehicleMake = _mapper.Map<VehicleMake>(updateMakeVm);
+
+            try
+            {
+                await _vehicleService.UpdateVehicleMakeAsync(id, updatedVehicleMake); // Use the correct method here
+                return RedirectToAction("Index");
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError("", "Failed to update the database.");
+            }
+
+            return View(updateMakeVm);
         }
 
         [HttpGet]

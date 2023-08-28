@@ -10,9 +10,9 @@
     <div class="container mt-5">
         <h2>Create Vehicle Model</h2>
 
-        <form asp-action="Create" class="mt-4">
+        <form method="post" class="mt-4">
             <div class="mb-3">
-                <label asp-for="Name" class="form-label">Name</label>
+                <label for ="Name" class="form-label">Name</label>
                 <input type="text" asp-for="Name" id="Name" name="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
@@ -21,7 +21,7 @@
                 var vehicleMakes = ViewBag.vehicleMakes as List<Service.Models.VehicleMake>;
             }
             <div class="mb-3">
-                <label asp-for="MakeId" class="form-label">Vehicle Make</label>
+                <label for="MakeId" class="form-label">Vehicle Make</label>
                 <select class="form-select" asp-for="MakeId" id="MakeId" name="MakeId" aria-label="Vehicle Make">
                     <option value="" selected>Choose a Vehicle Make</option>
                     @if (vehicleMakes != null)

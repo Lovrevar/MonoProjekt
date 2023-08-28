@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Routing.Constraints;
 using Service.DataAccess;
-using Service;
-using AutoMapper;
+using Service.Services.MakeService;
+using Service.ModelService;
+using Service.Services.ModelService;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<MyDbContext>();
-builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IVehicleMakeService, VehicleMakeService>();
+builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();

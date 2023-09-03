@@ -49,7 +49,6 @@ namespace MVC.Controllers
             }
 
             var vehicleMake = _mapper.Map<VehicleMake>(createMakeVm);
-
             try
             {
                 await _vehicleService.AddVehicleMakeAsync(vehicleMake);

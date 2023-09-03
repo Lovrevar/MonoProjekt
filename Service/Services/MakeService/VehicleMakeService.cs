@@ -83,5 +83,18 @@ namespace Service.Services.MakeService
         {
             return query.Skip((page - 1) * pageSize).Take(pageSize);
         }
+        public string GetAbrvForMakeById(int makeId)
+        {
+            // Assuming you have a method to retrieve a VehicleMake by Id from your data source
+            var vehicleMake = _dbContext.VehicleMakes.FirstOrDefault(vm => vm.Id == makeId);
+
+            if (vehicleMake != null)
+            {
+                return vehicleMake.Abrv;
+            }
+
+            return "0";
+        }
+
     }
 }

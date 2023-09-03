@@ -10,4 +10,5 @@ public interface IVehicleMakeService
     Task AddVehicleMakeAsync(VehicleMake vehicleMake);
     Task UpdateVehicleMakeAsync(int id, VehicleMake? vehicleMake);
     Task DeleteVehicleMakeAsync(int id);
+    string GetAbrvForMakeById(int makeId);
 }

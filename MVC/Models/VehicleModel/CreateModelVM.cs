@@ -1,7 +1,12 @@
-﻿namespace MVC.Models.VehicleModel;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class CreateModelVM
+namespace MVC.Models.VehicleModel;
+
+public class CreateModelVm
 {
+    [Required]
     public int MakeId { get; set; }
+    
+    [Required]
     public string Name { get; set; }
 }

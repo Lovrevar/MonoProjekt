@@ -3,11 +3,9 @@ using MVC.Models;
 using MVC.Models.VehicleModel;
 using Service;
 using Service.Models;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using MVC.Models.VehicleMake;
 using Service.ModelService;
 using Service.Services.MakeService;
 
@@ -35,7 +33,6 @@ namespace MVC.Controllers
             var pagingOptions = new Paging<VehicleModel> { Page = page, PageSize = pageSize };
 
             var pagingResult = await _vehicleModelService.GetVehicleModels(filteringOptions, sortingOptions, pagingOptions);
-
             var viewModel = new ModelListVM
             {
                 Models = _mapper.Map<List<ModelDetailsVM>>(pagingResult.Data),
@@ -65,23 +62,38 @@ public async Task<IActionResult> Create()
 }
 
 [HttpPost]
-public async Task<IActionResult> Create(CreateModelVM createModelVm)
+public async Task<IActionResult> Create(CreateModelVm createModelVm)
 {
     if (!ModelState.IsValid)
     {
         return View(createModelVm);
     }
 
-    var vehicleModel = _mapper.Map<VehicleModel>(createModelVm);
+    Console.WriteLine("CreateModelVM Name: " + createModelVm.Name);
+    Console.WriteLine("CreateModelVM MakeId: " + createModelVm.MakeId);
 
     try
     {
-        await _vehicleModelService.AddVehicleModelAsync(vehicleModel); 
+        // Retrieve the ABRV based on the selected MakeId from your data source
+        string abrv = _vehicleMakeService.GetAbrvForMakeById(createModelVm.MakeId); 
+
+        // Set the ABRV property in the VehicleModel
+        var vehicleModel = _mapper.Map<VehicleModel>(createModelVm);
+        vehicleModel.Abrv = abrv;
+        Console.WriteLine("Abrevation: " + abrv);
+
+        await _vehicleModelService.AddVehicleModelAsync(vehicleModel);
         return RedirectToAction("Index");
     }
-    catch (Exception)
+    catch (DbUpdateException ex)
     {
-        return View(createModelVm);
+        Console.WriteLine("Database update error: " + ex.Message);
+        return View("Error"); 
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("An error occurred: " + ex.Message);
+        return View("Error"); 
     }
 }
 
@@ -146,7 +158,7 @@ public async Task<IActionResult> Edit(int id, UpdateModelVM updateModelVm)
         return View(updateModelVm);
     }
 
-    await _vehicleModelService.UpdateVehicleModelAsync(id, vehicleModel); 
+    await _vehicleModelService.UpdateVehicleModelAsync(id, vehicleModel);
 
     return RedirectToAction("Index");
 }

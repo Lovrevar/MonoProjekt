@@ -15,7 +15,7 @@ namespace MVC.Models.MappingProfiles
                 .ForMember(dest => dest.Models, opt => opt.MapFrom(src => src.Data))
                 .ForMember(dest => dest.Pagination, opt => opt.MapFrom(src => src));
             CreateMap<Service.Models.VehicleModel, CreateModelVm>().ReverseMap();
-            CreateMap<Service.Models.VehicleModel, UpdateModelVM>().ReverseMap();
+            CreateMap<Service.Models.VehicleModel, UpdateModelVm>().ReverseMap();
         }
     }
 }

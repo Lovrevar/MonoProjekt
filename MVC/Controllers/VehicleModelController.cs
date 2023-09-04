@@ -70,14 +70,11 @@ public async Task<IActionResult> Create(CreateModelVm createModelVm)
     }
 
     Console.WriteLine("CreateModelVM Name: " + createModelVm.Name);
-    Console.WriteLine("CreateModelVM MakeId: " + createModelVm.MakeId);
+    Console.WriteLine("CreateModelVM MakeId: " + createModelVm.VehicleMakeId);
 
     try
     {
-        // Retrieve the ABRV based on the selected MakeId from your data source
-        string abrv = _vehicleMakeService.GetAbrvForMakeById(createModelVm.MakeId); 
-
-        // Set the ABRV property in the VehicleModel
+        string abrv = _vehicleMakeService.GetAbrvForMakeById(createModelVm.VehicleMakeId);
         var vehicleModel = _mapper.Map<VehicleModel>(createModelVm);
         vehicleModel.Abrv = abrv;
         Console.WriteLine("Abrevation: " + abrv);
@@ -114,11 +111,11 @@ public async Task<IActionResult> Edit(int id)
     var vehicleMakes = await _vehicleMakeService.GetVehicleMakes(filteringOptions, sortingOptions, pagingOptions);
     ViewBag.vehicleMakes = vehicleMakes.Data;
 
-    return View(_mapper.Map<UpdateModelVM>(vehicleModel));
+    return View(_mapper.Map<UpdateModelVm>(vehicleModel));
 }
 
 [HttpPost]
-public async Task<IActionResult> Edit(int id, UpdateModelVM updateModelVm)
+public async Task<IActionResult> Edit(int id, UpdateModelVm updateModelVm)
 {
     if (!ModelState.IsValid)
     {
@@ -126,38 +123,14 @@ public async Task<IActionResult> Edit(int id, UpdateModelVM updateModelVm)
     }
 
     var vehicleMake = await _vehicleMakeService.GetVehicleMakeByIdAsync(updateModelVm.Id);
-
-    if (vehicleMake == null)
-    {
-        ModelState.AddModelError("VehicleMakeId", "Vehicle make does not exist.");
-        var filteringOptions = new Filtering<VehicleMake?>();
-        var sortingOptions = new Sorting<VehicleMake?> { SortProperty = "Name", SortDirection = "asc" };
-        var pagingOptions = new Paging<VehicleMake?> { Page = 1, PageSize = int.MaxValue };
-
-        var vehicleMakes = await _vehicleMakeService.GetVehicleMakes(filteringOptions, sortingOptions, pagingOptions);
-        ViewBag.vehicleMakes = vehicleMakes.Data;
-
-        return View(updateModelVm);
-    }
+    Console.WriteLine("Name: " + updateModelVm.Name);
+    Console.WriteLine("VehicleMakeId: " + updateModelVm.VehicleMakeId);
+   
 
     var vehicleModel = _mapper.Map<VehicleModel>(updateModelVm);
     vehicleModel.VehicleMake = vehicleMake;
-    vehicleModel.Abrv = vehicleMake.Abrv;
 
     ModelState.Clear();
-
-    if (!TryValidateModel(vehicleModel, nameof(vehicleModel)))
-    {
-        var filteringOptions = new Filtering<VehicleMake?>();
-        var sortingOptions = new Sorting<VehicleMake?> { SortProperty = "Name", SortDirection = "asc" };
-        var pagingOptions = new Paging<VehicleMake?> { Page = 1, PageSize = int.MaxValue };
-
-        var vehicleMakes = await _vehicleMakeService.GetVehicleMakes(filteringOptions, sortingOptions, pagingOptions);
-        ViewBag.vehicleMakes = vehicleMakes.Data;
-
-        return View(updateModelVm);
-    }
-
     await _vehicleModelService.UpdateVehicleModelAsync(id, vehicleModel);
 
     return RedirectToAction("Index");

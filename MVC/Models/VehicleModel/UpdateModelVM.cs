@@ -2,11 +2,11 @@
 
 namespace MVC.Models.VehicleModel;
 
-public class UpdateModelVM
+public class UpdateModelVm
 {
     public int Id { get; set; }
     [Required]
-    public int MakeId { get; set; }
+    public int VehicleMakeId { get; set; }
     [Required]
     public string Name { get; set; }
 }

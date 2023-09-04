@@ -21,8 +21,8 @@
                 var vehicleMakes = ViewBag.vehicleMakes as List<Service.Models.VehicleMake>;
             }
             <div class="mb-3">
-                <label for="MakeId" class="form-label">Vehicle Make</label>
-                <select class="form-select" asp-for="MakeId" id="MakeId" name="MakeId" aria-label="Vehicle Make">
+                <label for="VehicleMakeId" class="form-label">Vehicle Make</label>
+                <select class="form-select" asp-for="VehicleMakeId" id="MakeId" name="VehicleMakeId" aria-label="Vehicle Make">
                     <option value="" selected>Choose a Vehicle Make</option>
                     @if (vehicleMakes != null)
                     {
@@ -32,7 +32,7 @@
                         }
                     }
                 </select>
-                <span asp-validation-for="MakeId" class="text-danger"></span>
+                <span asp-validation-for="VehicleMakeId" class="text-danger"></span>
             </div>
 
             <div class="mb-3">

@@ -1,4 +1,4 @@
-@model MVC.Models.VehicleModel.UpdateModelVM
+@model MVC.Models.VehicleModel.UpdateModelVm
 @using Microsoft.AspNetCore.Mvc.Rendering
 
 <!DOCTYPE html>
@@ -24,15 +24,15 @@
             var vehicleMakes = ViewBag.vehicleMakes as List<Service.Models.VehicleMake>;
         }
         <div class="mb-3">
-            <label asp-for="MakeId" class="form-label">Vehicle Make</label>
-            <select class="form-select" asp-for="MakeId" id="MakeId" aria-label="VehicleMake">
+            <label asp-for="VehicleMakeId" class="form-label">Vehicle Make</label>
+            <select class="form-select" asp-for="VehicleMakeId" id="VehileMakeId" aria-label="VehicleMake">
                 <option value="" selected>Choose a Vehicle Make</option>
                 @foreach (var vehicleMake in vehicleMakes)
                 {
                     <option value="@vehicleMake.Id">@vehicleMake.Name</option>
                 }
             </select>
-            <span asp-validation-for="MakeId" class="text-danger"></span>
+            <span asp-validation-for="VehicleMakeId" class="text-danger"></span>
         </div>
 
         <div class="mb-3">

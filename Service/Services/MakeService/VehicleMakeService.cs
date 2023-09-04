@@ -87,13 +87,7 @@ namespace Service.Services.MakeService
         {
             // Assuming you have a method to retrieve a VehicleMake by Id from your data source
             var vehicleMake = _dbContext.VehicleMakes.FirstOrDefault(vm => vm.Id == makeId);
-
-            if (vehicleMake != null)
-            {
-                return vehicleMake.Abrv;
-            }
-
-            return "0";
+            return vehicleMake.Abrv;
         }
 
     }
